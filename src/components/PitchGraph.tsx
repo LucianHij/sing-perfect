@@ -1,6 +1,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { Note, PitchDataPoint } from '../types';
+import { Card } from './ui';
 
 interface PitchGraphProps {
   referenceNotes: Note[];
@@ -48,7 +49,7 @@ export const PitchGraph: React.FC<PitchGraphProps> = ({ referenceNotes, userPitc
   }, [referenceNotes, userPitchData]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <Card>
       <h3 className="text-xl font-bold text-gray-900 mb-4">Pitch Comparison</h3>
       <p className="text-sm text-gray-600 mb-6">
         Blue line shows the expected pitch, red line shows your actual pitch
@@ -101,6 +102,6 @@ export const PitchGraph: React.FC<PitchGraphProps> = ({ referenceNotes, userPitc
           <span className="text-gray-700">Your Pitch</span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

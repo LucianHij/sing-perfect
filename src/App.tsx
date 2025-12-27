@@ -4,6 +4,7 @@ import { FileUpload } from './components/FileUpload';
 import { AudioRecorder } from './components/AudioRecorder';
 import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultsView } from './components/ResultsView';
+import { Button } from './components/ui';
 import { PitchAnalyzer } from './utils/pitchDetection';
 import { AnalysisEngine } from './utils/analysisEngine';
 import { MelodyExtractor } from './utils/melodyExtractor';
@@ -190,17 +191,14 @@ function App() {
             />
 
             <div className="flex justify-center mt-8">
-              <button
+              <Button
                 onClick={handleStartRecording}
                 disabled={!canProceedToRecording}
-                className={`px-8 py-3 rounded-lg font-semibold transition-colors ${
-                  canProceedToRecording
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
+                variant="primary"
+                size="lg"
               >
                 Continue to Recording
-              </button>
+              </Button>
             </div>
           </>
         )}

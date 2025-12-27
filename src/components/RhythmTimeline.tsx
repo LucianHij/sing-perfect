@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import type { RhythmMeasure } from '../types';
+import { Card } from './ui';
 
 interface RhythmTimelineProps {
   rhythmTimeline: RhythmMeasure[];
@@ -41,7 +42,7 @@ export const RhythmTimeline: React.FC<RhythmTimelineProps> = ({ rhythmTimeline }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <Card>
       <h3 className="text-xl font-bold text-gray-900 mb-4">Rhythm Timeline</h3>
       <p className="text-sm text-gray-600 mb-6">
         Measure-by-measure timing analysis
@@ -102,6 +103,6 @@ export const RhythmTimeline: React.FC<RhythmTimelineProps> = ({ rhythmTimeline }
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

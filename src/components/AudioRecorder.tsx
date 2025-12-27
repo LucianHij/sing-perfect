@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Play, Pause } from 'lucide-react';
 import { formatTime } from '../utils/audioUtils';
+import { Button, Card, InfoBox } from './ui';
 
 interface AudioRecorderProps {
   onRecordingComplete: (audioBlob: Blob) => void;
@@ -115,7 +116,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <Card padding="lg">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Record Your Performance</h2>
           <p className="text-gray-600">
@@ -157,58 +158,53 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         </div>
 
         {/* Control Buttons */}
-        <div className="flex justify-center space-x-4">
+        <div className="flex justify-center gap-4">
           {!isRecording ? (
             <>
-              <button
+              <Button
                 onClick={startRecording}
-                className="flex items-center space-x-2 px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-colors shadow-lg"
+                variant="danger"
+                size="lg"
+                icon={<Mic className="w-6 h-6" />}
               >
-                <Mic className="w-6 h-6" />
-                <span>Start Recording</span>
-              </button>
+                Start Recording
+              </Button>
 
               {referenceAudio && (
-                <button
+                <Button
                   onClick={togglePlayback}
-                  className="flex items-center space-x-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold transition-colors shadow-lg"
+                  variant="primary"
+                  size="lg"
+                  icon={isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                 >
-                  {isPlaying ? (
-                    <>
-                      <Pause className="w-5 h-5" />
-                      <span>Pause Preview</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-5 h-5" />
-                      <span>Preview Audio</span>
-                    </>
-                  )}
-                </button>
+                  {isPlaying ? 'Pause Preview' : 'Preview Audio'}
+                </Button>
               )}
             </>
           ) : (
-            <button
+            <Button
               onClick={stopRecording}
-              className="flex items-center space-x-2 px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-full font-semibold transition-colors shadow-lg"
+              variant="secondary"
+              size="lg"
+              icon={<Square className="w-6 h-6" />}
             >
-              <Square className="w-6 h-6" />
-              <span>Stop Recording</span>
-            </button>
+              Stop Recording
+            </Button>
           )}
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <h3 className="font-semibold text-gray-900 mb-2">Recording Tips:</h3>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• Find a quiet environment to minimize background noise</li>
-            <li>• Keep a consistent distance from your microphone</li>
-            <li>• {referenceAudio ? 'Sing along with the reference track' : 'Sing clearly and confidently'}</li>
-            <li>• Click "Stop Recording" when you finish the song</li>
-          </ul>
+        <div className="mt-8">
+          <InfoBox variant="info" title="Recording Tips:">
+            <ul className="space-y-1">
+              <li>• Find a quiet environment to minimize background noise</li>
+              <li>• Keep a consistent distance from your microphone</li>
+              <li>• {referenceAudio ? 'Sing along with the reference track' : 'Sing clearly and confidently'}</li>
+              <li>• Click "Stop Recording" when you finish the song</li>
+            </ul>
+          </InfoBox>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Award, TrendingUp, Music2, Clock, ChevronDown, ChevronUp } from 'lucide
 import type { AnalysisResult, NoteResult } from '../types';
 import { PitchGraph } from './PitchGraph';
 import { RhythmTimeline } from './RhythmTimeline';
+import { Button, Badge, Card, InfoBox } from './ui';
 
 interface ResultsViewProps {
   result: AnalysisResult;
@@ -23,11 +24,11 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onTryAgain }) 
   const getNoteStatusBadge = (status: NoteResult['status']) => {
     switch (status) {
       case 'correct':
-        return <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded">✓ Correct</span>;
+        return <Badge variant="success">✓ Correct</Badge>;
       case 'close':
-        return <span className="px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded">~ Close</span>;
+        return <Badge variant="warning">~ Close</Badge>;
       case 'incorrect':
-        return <span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded">✗ Incorrect</span>;
+        return <Badge variant="error">✗ Incorrect</Badge>;
     }
   };
 
@@ -75,12 +76,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onTryAgain }) 
           </div>
         </div>
 
-        <button
+        <Button
           onClick={onTryAgain}
-          className="mt-6 w-full bg-white text-blue-600 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors"
+          variant="secondary"
+          size="lg"
+          fullWidth
+          className="mt-6 bg-white text-blue-600 hover:bg-gray-100"
         >
           Try Again
-        </button>
+        </Button>
       </div>
 
       {/* Visualizations */}
@@ -93,7 +97,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onTryAgain }) 
       </div>
 
       {/* Note-by-Note Breakdown */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <Card>
         <button
           onClick={() => setShowDetails(!showDetails)}
           className="w-full flex items-center justify-between text-left"
@@ -155,12 +159,11 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onTryAgain }) 
             ))}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Feedback and Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="font-bold text-blue-900 mb-3">Practice Tips:</h3>
-        <ul className="space-y-2 text-blue-800">
+      <InfoBox variant="info" title="Practice Tips:">
+        <ul className="space-y-2">
           {result.pitchAccuracy < 70 && (
             <li>• Focus on matching the pitch more closely. Use a piano or tuner to practice individual notes.</li>
           )}
@@ -174,7 +177,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onTryAgain }) 
             <li>• Great job! Keep practicing to maintain consistency and try more challenging songs.</li>
           )}
         </ul>
-      </div>
+      </InfoBox>
     </div>
   );
 };

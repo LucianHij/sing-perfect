@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loader2, CheckCircle2 } from 'lucide-react';
+import { Card } from './ui';
 
 interface AnalysisProgressProps {
   status: 'processing' | 'detecting' | 'comparing' | 'complete';
@@ -14,7 +15,7 @@ export const AnalysisProgress: React.FC<AnalysisProgressProps> = ({ status }) =>
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <Card padding="lg">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Analyzing Your Performance</h2>
           <p className="text-gray-600">This may take a few moments...</p>
@@ -72,7 +73,7 @@ export const AnalysisProgress: React.FC<AnalysisProgressProps> = ({ status }) =>
         <div className="mt-6 text-center text-sm text-gray-500">
           Estimated time remaining: {status === 'complete' ? '0' : '10-15'} seconds
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
