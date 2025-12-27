@@ -54,41 +54,52 @@ npm run preview
 
 ## How to Use
 
+### Quick Start
+
 1. **Upload Files** (Step 1)
-   - Upload a reference audio file (MP3, WAV, etc.)
-   - Optionally upload sheet music (PDF, PNG, JPG, or MusicXML)
-   - You need at least one file to proceed
+   - Upload a reference audio file with clear vocals (MP3, WAV, FLAC recommended)
+   - OR upload sheet music (PDF, PNG, JPG, or MusicXML)
+   - At least one file is required
+   - **Tip**: Shorter songs (30-60 seconds) process faster
 
 2. **Record Your Performance** (Step 2)
-   - Click "Start Recording" to begin
-   - If you uploaded reference audio, it will play while you record
-   - Sing along and click "Stop Recording" when finished
+   - Click "Start Recording" and allow microphone access
+   - Sing along (reference audio will play if uploaded)
+   - Click "Stop Recording" when finished
 
 3. **View Results** (Step 3)
    - See your overall score and pitch/rhythm accuracy
-   - Review the pitch comparison graph
+   - Review the pitch comparison graph (blue = expected, red = your pitch)
    - Check the rhythm timeline for timing issues
-   - Expand the note-by-note breakdown for detailed feedback
+   - Expand note-by-note breakdown for detailed feedback
+
+### Analysis Modes
+
+- **Reference Audio Only**: App extracts melody and compares your singing
+- **Sheet Music Only**: App compares your pitch to written notes (uses mock data currently)
+- **Both**: Most comprehensive analysis with audio playback and notation reference
 
 ## Current Implementation Status
 
-### Completed
-- ✅ Full UI/UX workflow
-- ✅ File upload system
-- ✅ Audio recording with Web Audio API
-- ✅ Pitch detection engine (Pitchy)
-- ✅ Analysis engine for comparing performances
-- ✅ Results visualization (graphs, timelines, scores)
-- ✅ Demo mode with mock data
+### ✅ Completed Features
+- Full UI/UX workflow with step-by-step guidance
+- File upload system with validation
+- Audio recording with Web Audio API
+- **Real pitch detection** from user recordings (Pitchy)
+- **Melody extraction** from reference audio files
+- **Note segmentation** and duration estimation
+- Analysis engine for comparing performances
+- Results visualization (graphs, timelines, scores)
+- Error handling and file validation
+- Audio file quality checks
 
-### In Progress / Future Enhancements
-- 🔄 Real audio analysis (currently using mock data for demo)
-- 🔄 Sheet music OCR/parsing
-- 🔄 Extract reference notes from audio files
-- 🔄 Real-time pitch feedback during recording
-- 🔄 Progress tracking across multiple sessions
-- 🔄 More songs and reference materials
-- 🔄 Advanced vocal technique analysis
+### 🔄 In Progress / Future Enhancements
+- Sheet music OCR/parsing (MusicXML support planned)
+- Real-time pitch feedback during recording
+- Progress tracking across multiple sessions
+- Advanced vocal technique analysis (vibrato, breath support)
+- Multi-voice harmony support
+- Mobile app versions
 
 ## Architecture
 

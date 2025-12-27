@@ -4,11 +4,12 @@ import { FileUpload } from './components/FileUpload';
 import { AudioRecorder } from './components/AudioRecorder';
 import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultsView } from './components/ResultsView';
-// import { PitchAnalyzer } from './utils/pitchDetection';
+import { PitchAnalyzer } from './utils/pitchDetection';
 import { AnalysisEngine } from './utils/analysisEngine';
-import { generateMockReferenceNotes, generateMockUserPitchData } from './utils/mockData';
-// import { createAudioContext } from './utils/audioUtils';
-import type { UploadedFiles, AnalysisResult } from './types';
+import { MelodyExtractor } from './utils/melodyExtractor';
+import { generateMockReferenceNotes } from './utils/mockData';
+import { createAudioContext } from './utils/audioUtils';
+import type { UploadedFiles, AnalysisResult, Note } from './types';
 
 type AppState = 'upload' | 'record' | 'analyzing' | 'results';
 type AnalysisStatus = 'processing' | 'detecting' | 'comparing' | 'complete';
@@ -34,40 +35,49 @@ function App() {
     setAppState('record');
   };
 
-  const handleRecordingComplete = async (_audioBlob: Blob) => {
+  const handleRecordingComplete = async (audioBlob: Blob) => {
     setAppState('analyzing');
     setAnalysisStatus('processing');
 
     try {
-      // Simulate processing steps with delays for demo purposes
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Step 1: Extract reference notes
+      let referenceNotes: Note[];
+
+      if (uploadedFiles.referenceAudio) {
+        // Extract melody from reference audio
+        console.log('Extracting melody from reference audio...');
+        const melodyExtractor = new MelodyExtractor();
+        const extractedNotes = await melodyExtractor.extractFromAudioFile(uploadedFiles.referenceAudio);
+
+        // Simplify and quantize for better comparison
+        const simplifiedNotes = melodyExtractor.simplifyMelody(extractedNotes, 0.15);
+        referenceNotes = melodyExtractor.quantizeToGrid(simplifiedNotes, 0.125); // Eighth note grid
+
+        console.log(`Extracted ${referenceNotes.length} notes from reference audio`);
+      } else if (uploadedFiles.sheetMusic) {
+        // TODO: Parse sheet music (MusicXML or OMR)
+        // For now, use mock data as fallback
+        console.log('Sheet music parsing not yet implemented, using mock data');
+        referenceNotes = generateMockReferenceNotes();
+      } else {
+        // Should not happen due to validation, but just in case
+        throw new Error('No reference material provided');
+      }
+
       setAnalysisStatus('detecting');
 
-      // For this demo, we'll use mock data
-      // In production, you would:
-      // 1. Extract reference notes from sheet music or reference audio
-      // 2. Analyze the user's recording using PitchAnalyzer
-      // 3. Compare them using AnalysisEngine
+      // Step 2: Analyze user's recording
+      console.log('Analyzing your recording...');
+      const audioContext = createAudioContext();
+      const analyzer = new PitchAnalyzer(audioContext);
+      const userPitchData = await analyzer.analyzeRecording(audioBlob);
 
-      // Uncomment for production use:
-      // const audioContext = createAudioContext();
-      // const analyzer = new PitchAnalyzer(audioContext);
+      console.log(`Detected ${userPitchData.length} pitch points from your recording`);
 
-      // For demo: Use mock data
-      const referenceNotes = generateMockReferenceNotes();
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
       setAnalysisStatus('comparing');
 
-      // In production:
-      // const userPitchData = await analyzer.analyzeRecording(audioBlob);
-
-      // For demo:
-      const userPitchData = generateMockUserPitchData(referenceNotes);
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Analyze performance
+      // Step 3: Compare performance
+      console.log('Comparing your performance to reference...');
       const engine = new AnalysisEngine();
       const result = engine.analyzePerformance(referenceNotes, userPitchData);
 
@@ -78,7 +88,8 @@ function App() {
       setAppState('results');
     } catch (error) {
       console.error('Analysis error:', error);
-      alert('An error occurred during analysis. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      alert(`Analysis failed: ${errorMessage}\n\nPlease try again with a different audio file.`);
       setAppState('record');
     }
   };

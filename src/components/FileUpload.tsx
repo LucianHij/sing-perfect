@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import { Upload, Music, FileAudio } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Upload, Music, FileAudio, AlertCircle } from 'lucide-react';
+import { AudioValidator } from '../utils/audioValidator';
 
 interface FileUploadProps {
   onAudioUpload: (file: File) => void;
@@ -16,10 +17,29 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 }) => {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const sheetMusicInputRef = useRef<HTMLInputElement>(null);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
 
-  const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAudioChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setIsValidating(true);
+      setAudioError(null);
+
+      // Validate audio file
+      const validation = await AudioValidator.validateAudioFile(file);
+
+      if (!validation.valid) {
+        setAudioError(validation.error || 'Invalid audio file');
+        setIsValidating(false);
+        // Reset input
+        if (audioInputRef.current) {
+          audioInputRef.current.value = '';
+        }
+        return;
+      }
+
+      setIsValidating(false);
       onAudioUpload(file);
     }
   };
@@ -58,16 +78,25 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               </p>
               <p className="text-xs text-gray-400 mt-2">MP3, WAV, or other audio format</p>
             </div>
-            {!audioFile && (
+            {!audioFile && !isValidating && (
               <div className="flex items-center space-x-2 text-blue-600">
                 <Upload className="w-4 h-4" />
                 <span className="text-sm font-medium">Upload File</span>
               </div>
             )}
-            {audioFile && (
+            {isValidating && (
+              <div className="text-blue-600 text-sm font-medium">⏳ Validating file...</div>
+            )}
+            {audioFile && !isValidating && (
               <div className="text-green-600 text-sm font-medium">✓ File uploaded</div>
             )}
           </label>
+          {audioError && (
+            <div className="flex items-center space-x-2 text-red-600 text-sm font-medium mt-3 px-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{audioError}</span>
+            </div>
+          )}
         </div>
 
         {/* Sheet Music Upload */}
@@ -107,11 +136,23 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800">
-          <strong>Note:</strong> You can upload just audio, just sheet music, or both. The analysis
-          will adapt based on what you provide.
-        </p>
+      <div className="mt-6 space-y-4">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> You can upload just audio, just sheet music, or both. The analysis
+            will adapt based on what you provide.
+          </p>
+        </div>
+
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm font-semibold text-green-900 mb-2">Tips for best results:</p>
+          <ul className="text-sm text-green-800 space-y-1">
+            <li>• <strong>Reference Audio:</strong> Use clear vocal recordings without heavy instrumentation</li>
+            <li>• <strong>File Quality:</strong> Higher quality audio (WAV, FLAC) works better than compressed MP3</li>
+            <li>• <strong>Duration:</strong> Start with shorter songs (30-60 seconds) for quicker analysis</li>
+            <li>• <strong>Volume:</strong> Ensure the reference audio has clear, audible vocals</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
