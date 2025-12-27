@@ -8,9 +8,8 @@ import { Button } from './components/ui';
 import { PitchAnalyzer } from './utils/pitchDetection';
 import { AnalysisEngine } from './utils/analysisEngine';
 import { MelodyExtractor } from './utils/melodyExtractor';
-import { generateMockReferenceNotes } from './utils/mockData';
 import { createAudioContext } from './utils/audioUtils';
-import type { UploadedFiles, AnalysisResult, Note } from './types';
+import type { UploadedFiles, AnalysisResult } from './types';
 
 type AppState = 'upload' | 'record' | 'analyzing' | 'results';
 type AnalysisStatus = 'processing' | 'detecting' | 'comparing' | 'complete';
@@ -20,16 +19,11 @@ function App() {
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('processing');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFiles>({
     referenceAudio: null,
-    sheetMusic: null,
   });
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const handleAudioUpload = (file: File) => {
     setUploadedFiles((prev) => ({ ...prev, referenceAudio: file }));
-  };
-
-  const handleSheetMusicUpload = (file: File) => {
-    setUploadedFiles((prev) => ({ ...prev, sheetMusic: file }));
   };
 
   const handleStartRecording = () => {
@@ -41,29 +35,20 @@ function App() {
     setAnalysisStatus('processing');
 
     try {
-      // Step 1: Extract reference notes
-      let referenceNotes: Note[];
-
-      if (uploadedFiles.referenceAudio) {
-        // Extract melody from reference audio
-        console.log('Extracting melody from reference audio...');
-        const melodyExtractor = new MelodyExtractor();
-        const extractedNotes = await melodyExtractor.extractFromAudioFile(uploadedFiles.referenceAudio);
-
-        // Simplify and quantize for better comparison
-        const simplifiedNotes = melodyExtractor.simplifyMelody(extractedNotes, 0.15);
-        referenceNotes = melodyExtractor.quantizeToGrid(simplifiedNotes, 0.125); // Eighth note grid
-
-        console.log(`Extracted ${referenceNotes.length} notes from reference audio`);
-      } else if (uploadedFiles.sheetMusic) {
-        // TODO: Parse sheet music (MusicXML or OMR)
-        // For now, use mock data as fallback
-        console.log('Sheet music parsing not yet implemented, using mock data');
-        referenceNotes = generateMockReferenceNotes();
-      } else {
-        // Should not happen due to validation, but just in case
-        throw new Error('No reference material provided');
+      // Step 1: Extract reference notes from audio
+      if (!uploadedFiles.referenceAudio) {
+        throw new Error('No reference audio provided');
       }
+
+      console.log('Extracting melody from reference audio...');
+      const melodyExtractor = new MelodyExtractor();
+      const extractedNotes = await melodyExtractor.extractFromAudioFile(uploadedFiles.referenceAudio);
+
+      // Simplify and quantize for better comparison
+      const simplifiedNotes = melodyExtractor.simplifyMelody(extractedNotes, 0.15);
+      const referenceNotes = melodyExtractor.quantizeToGrid(simplifiedNotes, 0.125); // Eighth note grid
+
+      console.log(`Extracted ${referenceNotes.length} notes from reference audio`);
 
       setAnalysisStatus('detecting');
 
@@ -100,7 +85,7 @@ function App() {
     setAppState('upload');
   };
 
-  const canProceedToRecording = uploadedFiles.referenceAudio || uploadedFiles.sheetMusic;
+  const canProceedToRecording = uploadedFiles.referenceAudio !== null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -185,9 +170,7 @@ function App() {
           <>
             <FileUpload
               onAudioUpload={handleAudioUpload}
-              onSheetMusicUpload={handleSheetMusicUpload}
               audioFile={uploadedFiles.referenceAudio}
-              sheetMusicFile={uploadedFiles.sheetMusic}
             />
 
             <div className="flex justify-center mt-8">

@@ -1,23 +1,18 @@
 import React, { useRef, useState } from 'react';
-import { Upload, Music, FileAudio, AlertCircle } from 'lucide-react';
+import { Upload, FileAudio, AlertCircle } from 'lucide-react';
 import { AudioValidator } from '../utils/audioValidator';
 import { InfoBox } from './ui';
 
 interface FileUploadProps {
   onAudioUpload: (file: File) => void;
-  onSheetMusicUpload: (file: File) => void;
   audioFile: File | null;
-  sheetMusicFile: File | null;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
   onAudioUpload,
-  onSheetMusicUpload,
   audioFile,
-  sheetMusicFile,
 }) => {
   const audioInputRef = useRef<HTMLInputElement>(null);
-  const sheetMusicInputRef = useRef<HTMLInputElement>(null);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -45,16 +40,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
-  const handleSheetMusicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onSheetMusicUpload(file);
-    }
-  };
-
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="w-full max-w-2xl mx-auto p-6">
+      <div className="flex justify-center">
         {/* Reference Audio Upload */}
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 transition-colors">
           <input
@@ -99,55 +87,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             </div>
           )}
         </div>
-
-        {/* Sheet Music Upload */}
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-purple-500 transition-colors">
-          <input
-            ref={sheetMusicInputRef}
-            type="file"
-            accept="image/*,.pdf,.xml,.musicxml"
-            onChange={handleSheetMusicChange}
-            className="hidden"
-            id="sheet-music-upload"
-          />
-          <label
-            htmlFor="sheet-music-upload"
-            className="cursor-pointer flex flex-col items-center justify-center space-y-4"
-          >
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-              <Music className="w-8 h-8 text-purple-600" />
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">Sheet Music</p>
-              <p className="text-sm text-gray-500 mt-1">
-                {sheetMusicFile ? sheetMusicFile.name : 'Click to upload sheet music'}
-              </p>
-              <p className="text-xs text-gray-400 mt-2">PDF, PNG, JPG, or MusicXML</p>
-            </div>
-            {!sheetMusicFile && (
-              <div className="flex items-center space-x-2 text-purple-600">
-                <Upload className="w-4 h-4" />
-                <span className="text-sm font-medium">Upload File</span>
-              </div>
-            )}
-            {sheetMusicFile && (
-              <div className="text-green-600 text-sm font-medium">✓ File uploaded</div>
-            )}
-          </label>
-        </div>
       </div>
 
       <div className="mt-6 space-y-4">
-        <InfoBox variant="info">
-          <p>
-            <strong>Note:</strong> You can upload just audio, just sheet music, or both. The analysis
-            will adapt based on what you provide.
-          </p>
-        </InfoBox>
-
         <InfoBox variant="success" title="Tips for best results:">
           <ul className="space-y-1">
-            <li>• <strong>Reference Audio:</strong> Use clear vocal recordings without heavy instrumentation</li>
+            <li>• <strong>Clear Audio:</strong> Use vocal recordings without heavy instrumentation</li>
             <li>• <strong>File Quality:</strong> Higher quality audio (WAV, FLAC) works better than compressed MP3</li>
             <li>• <strong>Duration:</strong> Start with shorter songs (30-60 seconds) for quicker analysis</li>
             <li>• <strong>Volume:</strong> Ensure the reference audio has clear, audible vocals</li>

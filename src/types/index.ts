@@ -39,7 +39,6 @@ export interface RhythmMeasure {
 
 export interface UploadedFiles {
   referenceAudio: File | null;
-  sheetMusic: File | null;
 }
 
 export interface RecordingState {
