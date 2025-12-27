@@ -1,8 +1,9 @@
 import type { Note, PitchDataPoint, AnalysisResult, NoteResult, RhythmMeasure } from '../types';
-import { getCentsDifference } from './audioUtils';
+import { getCentsDifference, getCentsDifferenceOctaveInvariant } from './audioUtils';
 
 const PITCH_TOLERANCE_CENTS = 50; // 50 cents = half a semitone
 const RHYTHM_TOLERANCE_MS = 100; // 100ms timing tolerance
+const USE_OCTAVE_INVARIANT = true; // Compare notes ignoring octave differences (allows men to sing women's songs and vice versa)
 
 export class AnalysisEngine {
   /**
@@ -57,8 +58,13 @@ export class AnalysisEngine {
         current.confidence > prev.confidence ? current : prev
       );
 
-      // Compare frequencies
-      const centsDiff = Math.abs(getCentsDifference(actualPitch.frequency, expectedNote.frequency));
+      // Compare frequencies (with or without octave sensitivity)
+      // Octave-invariant mode: C4 and C5 are considered the same note
+      // This allows men to sing women's songs (or vice versa) in their natural range
+      const centsDiff = USE_OCTAVE_INVARIANT
+        ? getCentsDifferenceOctaveInvariant(actualPitch.frequency, expectedNote.frequency)
+        : Math.abs(getCentsDifference(actualPitch.frequency, expectedNote.frequency));
+
       const timingDiff = Math.abs(actualPitch.time - expectedNote.startTime);
 
       let status: 'correct' | 'incorrect' | 'close';

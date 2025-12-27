@@ -153,6 +153,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             <li>• <strong>Volume:</strong> Ensure the reference audio has clear, audible vocals</li>
           </ul>
         </div>
+
+        <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <p className="text-sm font-semibold text-purple-900 mb-2">🎵 Octave Flexibility:</p>
+          <p className="text-sm text-purple-800">
+            You can sing in your natural vocal range! If you're a man singing a woman's song (or vice versa),
+            the app will recognize notes correctly even if you're an octave lower or higher.
+            For example, singing C4 when the reference is C5 is marked as <strong>correct</strong> ✓
+          </p>
+        </div>
       </div>
     </div>
   );

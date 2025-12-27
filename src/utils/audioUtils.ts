@@ -52,6 +52,53 @@ export function getCentsDifference(freq1: number, freq2: number): number {
 }
 
 /**
+ * Calculate pitch difference in cents, ignoring octave differences
+ * This allows comparing notes regardless of which octave they're sung in.
+ *
+ * Example:
+ * - C4 vs C5 = 0 cents (same note, different octave)
+ * - C4 vs D4 = 200 cents (2 semitones)
+ * - C4 vs B3 = 100 cents (1 semitone, wraps around)
+ */
+export function getCentsDifferenceOctaveInvariant(freq1: number, freq2: number): number {
+  // Convert to MIDI note numbers
+  const midi1 = frequencyToMidi(freq1);
+  const midi2 = frequencyToMidi(freq2);
+
+  // Get pitch class (0-11, representing C through B)
+  const pitchClass1 = ((Math.round(midi1) % 12) + 12) % 12;
+  const pitchClass2 = ((Math.round(midi2) % 12) + 12) % 12;
+
+  // Calculate semitone difference
+  let semitoneDiff = Math.abs(pitchClass1 - pitchClass2);
+
+  // Handle wrap-around (e.g., B to C should be 1, not 11)
+  if (semitoneDiff > 6) {
+    semitoneDiff = 12 - semitoneDiff;
+  }
+
+  // Convert semitones to cents (100 cents per semitone)
+  return semitoneDiff * 100;
+}
+
+/**
+ * Check if two frequencies represent the same note (ignoring octave)
+ *
+ * @param freq1 First frequency in Hz
+ * @param freq2 Second frequency in Hz
+ * @param toleranceCents Maximum allowed difference in cents (default: 50)
+ * @returns true if notes match within tolerance
+ */
+export function isSameNoteIgnoringOctave(
+  freq1: number,
+  freq2: number,
+  toleranceCents: number = 50
+): boolean {
+  const centsDiff = getCentsDifferenceOctaveInvariant(freq1, freq2);
+  return centsDiff <= toleranceCents;
+}
+
+/**
  * Format time in MM:SS format
  */
 export function formatTime(seconds: number): string {
