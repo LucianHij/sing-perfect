@@ -13,8 +13,26 @@ export class AnalysisEngine {
     referenceNotes: Note[],
     userPitchData: PitchDataPoint[]
   ): AnalysisResult {
+    // Validate that user actually sang something
+    const minPitchPoints = Math.min(10, referenceNotes.length);
+    if (userPitchData.length < minPitchPoints) {
+      throw new Error(
+        'Not enough audio detected. Please make sure you are singing and your microphone is working.'
+      );
+    }
+
     const noteResults = this.compareNotes(referenceNotes, userPitchData);
     const rhythmTimeline = this.analyzeRhythm(referenceNotes, userPitchData);
+
+    // Validate that user sang a reasonable amount of the song
+    const sungNotes = noteResults.filter(r => r.actual !== null).length;
+    const sungPercentage = (sungNotes / noteResults.length) * 100;
+
+    if (sungPercentage < 30) {
+      throw new Error(
+        `Only ${Math.round(sungPercentage)}% of notes were detected. Please sing along with the reference audio.`
+      );
+    }
 
     // Calculate accuracies
     const pitchAccuracy = this.calculatePitchAccuracy(noteResults);
@@ -122,11 +140,12 @@ export class AnalysisEngine {
         }
       });
 
+      // If no notes were sung in this measure, mark as dragged (missed/late)
       if (count === 0) {
         rhythmTimeline.push({
           measure: measureNum,
-          status: 'on-beat',
-          difference: 0,
+          status: 'dragged',
+          difference: 1.0, // Large penalty for missing entire measure
         });
         return;
       }
